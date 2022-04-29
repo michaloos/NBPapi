@@ -21,7 +21,7 @@ namespace NBPapi.Controllers
         public NBPapiController(IMemoryCache memory) =>
             _memoryCache = memory;
         /// <summary>
-        /// 
+        /// Służy do wgrania danych do pamięci cache jeżeli takie dane w danej chwili nie istnieją
         /// </summary>
         /// <param name="key"></param>
         /// <param name="cacheObj"></param>
@@ -37,7 +37,8 @@ namespace NBPapi.Controllers
         }
 
         /// <summary>
-        /// 
+        /// Służy do zgrania danych z pamięci cache, jeżeli takie dane w danej chwili nie istnieją 
+        /// pobierane są z API NBP na nowo
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
@@ -76,7 +77,7 @@ namespace NBPapi.Controllers
         }
 
         /// <summary>
-        /// 
+        /// Pobiera tabelę z walutami oraz ich kursem z API NBP
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
@@ -92,11 +93,15 @@ namespace NBPapi.Controllers
         }
 
         /// <summary>
-        /// 
+        /// Zwraca wszystkie trzy literowe kody walut
         /// </summary>
         /// <returns></returns>
+        /// <response code="200">Zostały zwrócone wszystkie trzy literowe kody walut</response>
+        /// <response code="404">Nic nie zostało znalezione</response>
         // GET: api/<NBPCodesController>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IEnumerable<string> Get()
         {
             //pobieram z cache
@@ -112,12 +117,18 @@ namespace NBPapi.Controllers
         }
 
         /// <summary>
-        /// 
+        /// Zwraca kurs waluty podanej jako trzy literowy kod w parametrze
         /// </summary>
         /// <param name="code"></param>
         /// <returns></returns>
+        /// <response code="200">Został zwrócony kurs danej waluty</response>
+        /// <response code="400">Podano nie poprawny parametr</response>
+        /// <response code="404">Wprowadzona waluta nie została znaleziona</response>
         // GET api/<NBPCodesController>/PLN
         [HttpGet("{code}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult Get(string code)
         {
             if (code.Length != 3)
@@ -141,13 +152,19 @@ namespace NBPapi.Controllers
         }
 
         /// <summary>
-        /// 
+        /// Zwraca przeliczoną wartość waluty na złotówki, przy podaniu trzy literowego kodu oraz kwoty danej waluty
         /// </summary>
         /// <param name="code"></param>
         /// <param name="value"></param>
         /// <returns></returns>
+        /// <response code="200">Została zwrócona wartość w złotówkach</response>
+        /// <response code="400">Podano nie poprawne parametry</response>
+        /// <response code="404">Wprowadzona waluta nie została znaleziona</response>
         // GET api/<NBPCodesController>/PLN/value
         [HttpGet("{code}/{value}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult Get(string code, double value)
         {
             if (code.Length != 3 || value < 0)
